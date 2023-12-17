@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn it_works() {
         let mux = Arc::new(Mutex::new(101));
-        // spawn 10,000 mutexes
+        // spawn 10,000 thread, each trying to increment the data held in the mutex
         std::thread::scope(|scope| {
             for i in 0..10_000 {
                 let mute = mux.clone();
@@ -130,5 +130,23 @@ mod tests {
         // test final number
         let d = mux.lock();
         assert_eq!(*d, 10_101);
+    }
+
+    #[test]
+    fn array() {
+        let mux = Arc::new(Mutex::new(Vec::with_capacity(1000)));
+        // spawn 10,000 thread, each trying to increment the data held in the mutex
+        std::thread::scope(|scope| {
+            for i in 0..1000 {
+                let mute = mux.clone();
+                scope.spawn(move || {
+                    let mut lock = mute.lock();
+                    lock.push(i);
+                });
+            }
+        });
+        // test final number
+        let d = mux.lock();
+        assert_eq!(d.len(), 1000);
     }
 }

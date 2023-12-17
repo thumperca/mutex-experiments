@@ -8,23 +8,22 @@ use std::sync::Arc;
 use std::thread;
 
 fn main() {
-    let m = Arc::new(Mutex::new(520));
+    println!("Started..");
+    let m = Arc::new(Mutex::new(1));
 
     thread::scope(|scope| {
-        let mx = m.clone();
-        let mx2 = m.clone();
-
-        scope.spawn(move || {
-            let mut data = mx.lock();
-            *data = 420;
-        });
-
-        scope.spawn(move || {
-            let mut data = mx2.lock();
-            *data = 840;
-        });
+        for i in 0..100 {
+            let mux = m.clone();
+            scope.spawn(move || {
+                let mut d = mux.lock();
+                *d += 1;
+                // sleep while holding lock
+                std::thread::sleep(std::time::Duration::from_millis(20));
+            });
+        }
     });
 
     let data = m.lock();
-    println!("Hello, world! {}", data);
+    debug_assert!(*data == 101);
+    println!("finished with {}", *data);
 }
