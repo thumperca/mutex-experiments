@@ -1,9 +1,10 @@
 mod raw_mutex;
-mod unsafe_mutex;
+mod safe_spin_mutex;
+mod unsafe_spin_mutex;
 
+use safe_spin_mutex::Mutex;
 use std::sync::Arc;
 use std::thread;
-use unsafe_mutex::Mutex;
 
 fn main() {
     let m = Arc::new(Mutex::new(520));
@@ -13,18 +14,16 @@ fn main() {
         let mx2 = m.clone();
 
         scope.spawn(move || {
-            let data = mx.lock();
+            let mut data = mx.lock();
             *data = 420;
-            mx.unlock();
         });
 
         scope.spawn(move || {
-            let data = mx2.lock();
+            let mut data = mx2.lock();
             *data = 840;
-            mx2.unlock();
         });
     });
 
     let data = m.lock();
-    println!("Hello, world! {data}");
+    println!("Hello, world! {}", data);
 }

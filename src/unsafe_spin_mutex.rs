@@ -38,7 +38,8 @@ impl<T> Mutex<T> {
         d
     }
 
-    pub fn unlock(&self) {
+    // Calling unlock incorrectly can cause multiple threads to have access to data
+    pub unsafe fn unlock(&self) {
         self.lock.store(false, Relaxed);
     }
 }
