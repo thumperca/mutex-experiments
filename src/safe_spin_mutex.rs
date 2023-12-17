@@ -87,12 +87,13 @@ unsafe impl<T> Sync for Mutex<T> {}
 mod tests {
     use super::*;
 
+    #[test]
     fn it_works() {
         let mux = Mutex::new(100);
         let mut d = mux.lock();
         *d += 1;
         drop(d);
-        let d = mux.lock();
+        let d = *mux.lock();
         assert_eq!(d, 101);
     }
 }
