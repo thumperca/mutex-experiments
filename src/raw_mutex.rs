@@ -1,8 +1,20 @@
+use std::hint::spin_loop;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering::{Acquire, Relaxed};
-use std::thread::sleep;
-use std::time::Duration;
 
+/// An unsafe implementation of Mutex using Raw Pointers
+///
+/// ## Features
+/// - Simple
+/// - Requires manual unlocking
+///
+/// ## Usage
+/// ```
+/// let mux = Mutex::new(100);
+/// let mut d = mux.lock();
+/// *d += 1
+/// mux.unlock();
+/// ```
 pub struct Mutex<T> {
     lock: AtomicBool,
     data: *mut T,
@@ -19,7 +31,7 @@ impl<T> Mutex<T> {
 
     pub fn lock(&self) -> &mut T {
         while let Err(_) = self.lock.compare_exchange(false, true, Acquire, Relaxed) {
-            sleep(Duration::from_nanos(10));
+            spin_loop();
         }
         let d = unsafe { &mut *self.data };
         d
