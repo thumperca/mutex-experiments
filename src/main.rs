@@ -1,9 +1,9 @@
-mod mutex;
+mod fair_mutex;
 mod raw_mutex;
 mod safe_spin_mutex;
 mod unsafe_spin_mutex;
 
-use mutex::Mutex;
+use fair_mutex::Mutex;
 use std::sync::Arc;
 use std::thread;
 

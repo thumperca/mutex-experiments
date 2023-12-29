@@ -58,7 +58,8 @@ where
     }
 }
 
-/// A safe implementation of a Mutex without using a spin lock
+/// A fair and safe implementation of a Mutex without a non-spin lock implementation.
+/// It uses a FIFO mechanism to resolve lock contention
 ///
 /// # Usage
 /// ```
